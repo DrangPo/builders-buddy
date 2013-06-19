@@ -1,0 +1,87 @@
+$module()
+
+$import common.comm.lslm;
+$import common.log.lslm;
+$import common.storage.lslm;
+$import child.constants.lslm;
+
+//==============================================================================
+//Child Core variables
+//==============================================================================
+integer parent_channel = 0;
+integer parent_handle = 0;
+integer listen_channel;
+string listen_base;
+string listen_command;
+list listen_details;
+string listen_id;
+string listen_name;
+integer listen_password;
+string listen_target;
+
+//==============================================================================
+//Child Core Functions
+//==============================================================================
+
+////////////////////
+integer parse_listen(integer channel, string name, key id, string message)
+{
+	listen_channel = channel;
+	list parts = llParseStringKeepNulls(message, ["|"], []);
+	
+	if(llGetListLength(parts) < 3) return FALSE;
+	
+	
+	//Yes, for us
+	listen_base = llList2String(parts, 0);
+	listen_target = llList2String(parts, 1);
+	listen_command = llList2String(parts, 2);
+	
+	if(llGetListLength(parts) > 3)
+		listen_details = llList2List(parts, 3, -1);
+	else
+		listen_details = [];
+		
+	debugl(DEBUG, ["child.core.parse_listen()", "listen_base: " + listen_base, "lisen_target: " + listen_target, "listen_command: " + listen_command, "listen_details: " + llDumpList2String(listen_details, "|")]);
+		
+	return TRUE;
+}
+
+////////////////////
+send_module(string dest_module, string command, list details, integer force)
+{
+	send(MANAGER, dest_module, command, details);
+}
+
+////////////////////
+start_listening()
+{
+	if(parent_handle != 0) return;
+	
+	//Do  nothing if we're already listening
+	if(parent_channel == 0) {
+		//Grab the channel
+		integer config_channel = (integer)get(VAR_CHANNEL, "-192567");
+		if(config_channel == 0) {
+			debug(ERROR, "Invalid channel supplied, cannot listen!");
+			return;
+		}
+		
+		parent_channel = config_channel;
+	}
+	
+	parent_handle = llListen(parent_channel, "", NULL_KEY, "");
+	send_module(ALL_MODULES, "listen_start", [parent_channel], FALSE);
+}
+
+////////////////////
+stop_listening()
+{
+	//Have an active listener?
+	if(parent_handle != 0) {
+		llListenRemove(parent_handle);
+		send_module(ALL_MODULES, "listen_stop", [parent_channel], FALSE);
+		parent_handle = 0;
+	}
+}
+

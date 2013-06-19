@@ -1,0 +1,18 @@
+$module()
+
+//==============================================================================
+//Manager Constants
+//==============================================================================
+string VAR_ALLOW_CLEAN = "allow_clean";
+string VAR_ALLOW_GROUP = "allow_group";
+string VAR_ALLOW_FORGET = "allow_forget";
+string VAR_ALLOW_RECORD = "allow_record";
+string VAR_CONFIRM_CLEAN = "confirm_clean";
+string VAR_CONFIRM_FINISH = "confirm_finish";
+string VAR_CREATORS = "creators";
+string VAR_DELETE_ON_REZ = "delete_on_rez";
+string VAR_EVENT_TIMEOUT = "event_timeout";
+string VAR_FULL_RIGHTS = "full_rights";
+string VAR_MENU_LISTEN_TIME = "menu_listen";
+string VAR_MENU_ON_TOUCH = "menu_on_touch";
+string VAR_SAFE_CLEAN = "safe_clean";
