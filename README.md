@@ -5,7 +5,7 @@ Linden Scripting Language (LSL) Modules to perform large, multi-piece, build rez
 
 License
 =======
-Please view the file [LICENSE.md](Licence.md "License") before downloading and using Builder's Buddy.
+Please view the file [LICENSE.md](https://github.com/elnewfie/builders-buddy/blob/master/LICENSE.md "License") before downloading and using Builder's Buddy.
 
 Folder Structure
 ================
