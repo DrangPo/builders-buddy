@@ -1,19 +1,9 @@
 $module()
+$import common.comm.core.lslm;
 $import common.log.lslm;
-$import common.storage.lslm;
-$import common.comm.lslm;
+$import storage.core.lslm;
 $import base.constants.lslm;
-
-//==============================================================================
-//Base core variables
-//==============================================================================
-integer base_channel;
-integer base_handle;
-integer child_channel;
-integer child_handle;
-string listen_base;
-integer listen_channel;
-key listen_source = NULL_KEY;
+$import base.vars.lslm;
 
 //==============================================================================
 //Base core functions

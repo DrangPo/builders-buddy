@@ -1,14 +1,8 @@
 $module()
 
+$import common.comm.vars.lslm;
 $import common.constants.lslm;
 $import common.log.lslm;
-
-//==============================================================================
-//Communication variables
-//==============================================================================
-string msg_command;
-list msg_details;
-string msg_module;
 
 //==============================================================================
 //Communication functions

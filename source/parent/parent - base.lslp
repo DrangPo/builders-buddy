@@ -9,6 +9,12 @@
 // The License for this script has changed relative to prior versions; please
 //  check the website noted above for details.
 //==============================================================================
+$import common.constants.lslm;
+$import storage.core.lslm;
+$import common.comm.core.lslm;
+$import module.group.core.lslm;
+$import base.constants.lslm;
+$import base.core.lslm;
 
 //==============================================================================
 // CONFIGURABLE SETTINGS
@@ -69,12 +75,9 @@ initialize() {        //DO NOT TOUCH THIS LINE!
 //==============================================================================
 // DO NOT EDIT ANYTHING BELOW THIS LINE!!!
 //==============================================================================
-$import common.constants.lslm;
-$import common.storage.lslm;
-$import common.comm.lslm;
-$import module.group.lslm;
-$import base.constants.lslm;
-$import base.core.lslm;
+//$merge common/constants.lslm
+//$merge module/group/constants.lslm
+//$merge base/constants.lslm
 
 //==============================================================================
 //Base variables
@@ -91,6 +94,21 @@ string rez_postfix = "";
 integer rez_single = FALSE;
 integer rez_timeout = 0;
 key rez_user = NULL_KEY;
+
+//$merge common/comm/vars.lslm
+
+//$merge base/vars.lslm
+
+//$merge storage/vars.lslm
+
+//$merge common/comm/core.lslm
+
+//$merge base/core.lslm
+
+//$merge storage/core.lslm
+
+//$merge module/group/core.lslm
+
 
 
 //==============================================================================

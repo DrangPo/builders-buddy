@@ -10,7 +10,7 @@
 //  check the website noted above for details.
 //==============================================================================
 $import common.constants.lslm;
-$import common.storage.lslm;
+$import storage.core.lslm;
 $import common.log.lslm;
 $import child.constants.lslm;
 $import child.core.lslm;
@@ -101,6 +101,10 @@ initialize() {        //DO NOT TOUCH THIS LINE!
 // DO NOT EDIT ANYTHING BELOW THIS LINE!!!
 //==============================================================================
 
+//$merge common/constants.lslm
+
+//$merge child/constants.lslm
+
 //==============================================================================
 //Base variables
 //==============================================================================
@@ -124,6 +128,16 @@ integer reparent_time = 0;
 integer rez_timeout = 0;
 integer timer_active = FALSE;
 integer moving_single = FALSE;
+
+//$merge storage/vars.lslm
+
+//$merge common/comm/vars.lslm
+
+//$merge storage/core.lslm
+
+//$merge child/core.lslm
+
+//$merge common/comm/core.lslm
 
 //==============================================================================
 //Base Functions

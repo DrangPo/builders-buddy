@@ -1,6 +1,6 @@
 $import common.constants.lslm;
 $import common.log.lslm;
-$import common.storage.lslm;
+$import storage.core.lslm;
 $import module.constants.lslm;
 $import module.core.lslm;
 
@@ -102,12 +102,7 @@ got_message()
 		integer bAbsolute = llList2Integer(msg_details, 2);
 		integer from_base = llList2Integer(msg_details, 3);
 		if(from_base) {
-			debugl(DEBUG, [
-				"Recording to object description:", 
-				"offset: " + (string)vOffset, 
-				"rotation: " + (string)rRotation, 
-				"absolute: " + (string)bAbsolute
-			]);
+			debugl(DEBUG, ["Recording to object description:", "offset: " + (string)vOffset, "rotation: " + (string)rRotation, "absolute: " + (string)bAbsolute]);
 			saveToDescription(vOffset, rRotation, bAbsolute);
 		}
 		return;

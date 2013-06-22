@@ -11,10 +11,10 @@
 //==============================================================================
 $import common.constants.lslm;
 $import common.log.lslm;
-$import common.storage.lslm;
+$import storage.core.lslm;
 $import module.constants.lslm;
 $import module.core.lslm;
-$import module.group.lslm;
+$import module.group.core.lslm;
 
 //==============================================================================
 // CONFIGURABLE SETTINGS
@@ -72,6 +72,12 @@ initialize() {        //DO NOT TOUCH THIS LINE!
 // DO NOT EDIT ANYTHING BELOW THIS LINE!!!
 //==============================================================================
 
+//$merge common/constants.lslm
+
+//$merge module/constants.lslm
+
+//$merge module/group/constants.lslm
+
 //==============================================================================
 // Group Rezzer Constants
 //==============================================================================
@@ -86,6 +92,19 @@ list groups;
 string action = "";
 integer page = 0;
 
+//$merge storage/vars.lslm
+
+//$merge common/comm/vars.lslm
+
+//$merge storage/core.lslm
+
+//$merge module/core.lslm
+
+//$merge common/util.lslm
+
+//$merge common/comm/core.lslm
+
+//$merge module/group/core.lslm
 
 //==============================================================================
 // Group Rezzer Functions

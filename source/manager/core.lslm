@@ -2,8 +2,8 @@ $module()
 
 $import common.constants.lslm;
 $import common.log.lslm;
-$import common.comm.lslm;
-$import common.storage.lslm;
+$import common.comm.core.lslm;
+$import storage.core.lslm;
 $import common.util.lslm;
 $import module.constants.lslm;
 $import manager.constants.lslm;
@@ -475,15 +475,7 @@ manager_stop_listening()
 ////////////////////
 register_mod(string module, string module_type, string menu_type, string events, string label, string desc)
 {
-	debugl(TRACE, [
-		"manager.core.register_mod()", 
-		"module: " + module,
-		"module type: " + module_type, 
-		"menu type: " + menu_type, 
-		"events: " + events, 
-		"menuLabel: " + label, 
-		"menuDesc: " + desc
-	]);
+	debugl(TRACE, ["manager.core.register_mod()", "module: " + module,"module type: " + module_type, "menu type: " + menu_type, "events: " + events, "menuLabel: " + label, "menuDesc: " + desc]);
 	
 	//Only accept registrations for this script type
 	if(module_type != base_type) {

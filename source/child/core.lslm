@@ -1,8 +1,8 @@
 $module()
 
-$import common.comm.lslm;
+$import common.comm.core.lslm;
 $import common.log.lslm;
-$import common.storage.lslm;
+$import storage.core.lslm;
 $import child.constants.lslm;
 
 //==============================================================================
