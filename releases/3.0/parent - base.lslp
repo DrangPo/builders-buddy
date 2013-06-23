@@ -71,42 +71,6 @@ initialize() {        //DO NOT TOUCH THIS LINE!
 //==============================================================================
 
 //==============================================================================
-//General Constants
-//==============================================================================
-string ALL_CHILDREN = "all";
-string ALL_MODULES = "all";
-string BASE = "base";
-integer BB_API = -11235813;
-integer BB_API_REPLY = -11235814;
-string BB_VERSION = "3.0"; 
-string MANAGER = "manager";
-string MODULE = "module";
-string TYPE_CHILD = "C";
-string TYPE_PARENT = "P";
-
-//==============================================================================
-//Group Rezzer Constants
-//==============================================================================
-string VAR_REMOVE_TAG = "group_remove_tag";
-string VAR_PREFIX = "group_prefix";
-string VAR_POSTFIX = "group_postfix";
-
-//==============================================================================
-//Constants - Base Functionality
-//==============================================================================
-string VAR_ALLOW_GROUP = "allow_group";
-string VAR_BASE_ID = "base_id";
-string VAR_BEACON_DELAY = "beacon_delay";
-string VAR_BULK_BUILD = "bulk_build";
-string VAR_CHANNEL = "channel";
-string VAR_CLEAN_BEFORE_REZ = "clean_before_rez";
-string VAR_DIE_ON_CLEAN = "die_on_clean";
-string VAR_RANDOMIZE_CHANNEL = "randomize_channel";
-string VAR_REZ_TIMEOUT = "rez_timeout";
-string VAR_TIMER_DELAY = "timer_delay";
-string VAR_USE_BEACON = "use_beacon";
-
-//==============================================================================
 //Base variables
 //==============================================================================
 integer beacon_timeout = 0;
@@ -124,24 +88,18 @@ key rez_user = NULL_KEY;
 
 
 //==============================================================================
-//Communication variables
+//General Constants
 //==============================================================================
-string msg_command;
-list msg_details;
-string msg_module;
-
-
-//==============================================================================
-//Base core variables
-//==============================================================================
-integer base_channel;
-integer base_handle;
-integer child_channel;
-integer child_handle;
-string listen_base;
-integer listen_channel;
-key listen_source = NULL_KEY;
-
+string ALL_CHILDREN = "all";
+string ALL_MODULES = "all";
+string BASE = "base";
+integer BB_API = -11235813;
+integer BB_API_REPLY = -11235814;
+string BB_VERSION = "3.0"; 
+string MANAGER = "manager";
+string MODULE = "module";
+string TYPE_CHILD = "C";
+string TYPE_PARENT = "P";
 
 //==============================================================================
 //Storage Variables
@@ -149,7 +107,67 @@ key listen_source = NULL_KEY;
 list values = [];
 list vars = [];
 
+//==============================================================================
+//Storage Functions
+//==============================================================================
 
+////////////////////
+string get(string name, string default_value)
+{
+    integer iFound = llListFindList(vars, [ name ]);
+    if(iFound != -1)
+        return llList2String(values, iFound);
+    
+    return default_value;
+}
+
+////////////////////
+list get_list(string varName, list default_list)
+{
+    integer iFound = llListFindList(vars, [ varName ]);
+    if(iFound != -1) {
+        return llParseStringKeepNulls(llList2String(values, iFound), ["|"],  [""]);
+    }
+    
+    return default_list;
+}
+
+////////////////////
+integer is_yes(string var, string default_value) {
+	return (llToUpper(get(var, default_value)) == "Y");
+}
+
+////////////////////
+set(string name, string value)
+{
+    //Make the var lowercase
+    name = llToLower(name);
+    
+    //See if we have a var by this name already
+    integer iFound = llListFindList(vars, [name]);
+    if(iFound != -1) {
+        //Replace the existing entry
+        values = llListReplaceList(values, [value], iFound, iFound);
+    } else {
+        //Add it
+        vars += name;
+        values += value;
+    }
+}
+
+////////////////////
+set_list(string name, list values)
+{
+	set(name, llDumpList2String(values, "|"));
+}
+
+
+//==============================================================================
+//Communication variables
+//==============================================================================
+string msg_command;
+list msg_details;
+string msg_module;
 
 //==============================================================================
 //Communication functions
@@ -194,6 +212,97 @@ send(string source, string dest, string command, list details)
     );
 }
 
+//==============================================================================
+//Group Rezzer Constants
+//==============================================================================
+string VAR_REMOVE_TAG = "group_remove_tag";
+string VAR_PREFIX = "group_prefix";
+string VAR_POSTFIX = "group_postfix";
+
+//==============================================================================
+//Group Rezzer Core Functions
+//==============================================================================
+
+////////////////////
+list get_group_names(string text, string prefix, string postfix)
+{
+	integer end = 0;
+	integer start = 1;
+	
+	//Do we have the prefix at the beginning?
+	if(llGetSubString(text, 0, 0) == prefix) {
+		//Do we have a subsequent postfix?
+		end = llSubStringIndex(text, postfix);
+		if(end == -1) return [];	//No match
+	
+	} else {
+		return [];		//No group name
+	}
+	
+	//Group name must be the text in between
+	list groups = llParseStringKeepNulls(llGetSubString(text, start, end - 1), [","], []);
+	return groups;
+}
+
+////////////////////
+integer is_group_match(string prefix, string group, string postfix, string name)
+{
+	
+	list group_names = get_group_names(name, prefix, postfix);
+	integer i;
+	integer group_count = llGetListLength(group_names);
+	for(i = 0; i < group_count; i++) {
+		if(group == llList2String(group_names, i)) return TRUE;
+	}
+	
+	//If we got here, no match
+	return FALSE;
+}
+
+////////////////////
+string get_base_name(string prefix, string postfix, string name) {
+	integer end = 0;
+	integer start = 1;
+	
+	//Do we have the prefix at the beginning?
+	if(llGetSubString(name, 0, 0) == prefix) {
+		//Do we have a subsequent postfix?
+		end = llSubStringIndex(name, postfix);
+		if(end == -1) return name;	//No match
+	
+	} else {
+		return name;		//Use full name
+	}
+	
+	//Base name is everything past the postfix
+	return llGetSubString(name, end + 1, -1);
+}
+
+//==============================================================================
+//Constants - Base Functionality
+//==============================================================================
+string VAR_ALLOW_GROUP = "allow_group";
+string VAR_BASE_ID = "base_id";
+string VAR_BEACON_DELAY = "beacon_delay";
+string VAR_BULK_BUILD = "bulk_build";
+string VAR_CHANNEL = "channel";
+string VAR_CLEAN_BEFORE_REZ = "clean_before_rez";
+string VAR_DIE_ON_CLEAN = "die_on_clean";
+string VAR_RANDOMIZE_CHANNEL = "randomize_channel";
+string VAR_REZ_TIMEOUT = "rez_timeout";
+string VAR_TIMER_DELAY = "timer_delay";
+string VAR_USE_BEACON = "use_beacon";
+
+//==============================================================================
+//Base core variables
+//==============================================================================
+integer base_channel;
+integer base_handle;
+integer child_channel;
+integer child_handle;
+string listen_base;
+integer listen_channel;
+key listen_source = NULL_KEY;
 
 //==============================================================================
 //Base core functions
@@ -280,123 +389,6 @@ send_manager(string command, list details)
 {
 	send(BASE, MANAGER, command, details);
 }
-
-
-//==============================================================================
-//Storage Functions
-//==============================================================================
-
-////////////////////
-string get(string name, string default_value)
-{
-    integer iFound = llListFindList(vars, [ name ]);
-    if(iFound != -1)
-        return llList2String(values, iFound);
-    
-    return default_value;
-}
-
-////////////////////
-list get_list(string varName, list default_list)
-{
-    integer iFound = llListFindList(vars, [ varName ]);
-    if(iFound != -1) {
-        return llParseStringKeepNulls(llList2String(values, iFound), ["|"],  [""]);
-    }
-    
-    return default_list;
-}
-
-////////////////////
-integer is_yes(string var, string default_value) {
-	return (llToUpper(get(var, default_value)) == "Y");
-}
-
-////////////////////
-set(string name, string value)
-{
-    //Make the var lowercase
-    name = llToLower(name);
-    
-    //See if we have a var by this name already
-    integer iFound = llListFindList(vars, [name]);
-    if(iFound != -1) {
-        //Replace the existing entry
-        values = llListReplaceList(values, [value], iFound, iFound);
-    } else {
-        //Add it
-        vars += name;
-        values += value;
-    }
-}
-
-////////////////////
-set_list(string name, list values)
-{
-	set(name, llDumpList2String(values, "|"));
-}
-
-
-//==============================================================================
-//Group Rezzer Core Functions
-//==============================================================================
-
-////////////////////
-list get_group_names(string text, string prefix, string postfix)
-{
-	integer end = 0;
-	integer start = 1;
-	
-	//Do we have the prefix at the beginning?
-	if(llGetSubString(text, 0, 0) == prefix) {
-		//Do we have a subsequent postfix?
-		end = llSubStringIndex(text, postfix);
-		if(end == -1) return [];	//No match
-	
-	} else {
-		return [];		//No group name
-	}
-	
-	//Group name must be the text in between
-	list groups = llParseStringKeepNulls(llGetSubString(text, start, end - 1), [","], []);
-	return groups;
-}
-
-////////////////////
-integer is_group_match(string prefix, string group, string postfix, string name)
-{
-	
-	list group_names = get_group_names(name, prefix, postfix);
-	integer i;
-	integer group_count = llGetListLength(group_names);
-	for(i = 0; i < group_count; i++) {
-		if(group == llList2String(group_names, i)) return TRUE;
-	}
-	
-	//If we got here, no match
-	return FALSE;
-}
-
-////////////////////
-string get_base_name(string prefix, string postfix, string name) {
-	integer end = 0;
-	integer start = 1;
-	
-	//Do we have the prefix at the beginning?
-	if(llGetSubString(name, 0, 0) == prefix) {
-		//Do we have a subsequent postfix?
-		end = llSubStringIndex(name, postfix);
-		if(end == -1) return name;	//No match
-	
-	} else {
-		return name;		//Use full name
-	}
-	
-	//Base name is everything past the postfix
-	return llGetSubString(name, end + 1, -1);
-}
-
-
 
 //==============================================================================
 // Base Functions

@@ -9,13 +9,6 @@
 // The License for this script has changed relative to prior versions; please
 //  check the website noted above for details.
 //==============================================================================
-$import common.constants.lslm;
-$import common.log.lslm;
-$import common.comm.core.lslm;
-$import storage.core.lslm;
-$import common.util.lslm;
-$import module.constants.lslm;
-$import module.core.lslm;
 
 //==============================================================================
 // CONFIGURABLE SETTINGS
@@ -63,22 +56,13 @@ initialize() {        //DO NOT TOUCH THIS LINE!
 //==============================================================================
 // DO NOT EDIT ANYTHING BELOW THIS LINE!!!
 //==============================================================================
-
-//$merge common/constants.lslm
-
-//$merge module/constants.lslm
-
-//$merge common/comm/vars.lslm
-
-//$merge storage/vars.lslm
-
-//$merge common/comm/core.lslm
-
-//$merge storage/core.lslm
-
-//$merge common/util.lslm
-
-//$merge module/core.lslm
+$import common.constants.lslm;
+$import common.log.lslm;
+$import common.comm.core.lslm;
+$import storage.core.lslm;
+$import common.util.lslm;
+$import module.constants.lslm;
+$import module.core.lslm;
 
 //==============================================================================
 //Creator Variables

@@ -1,48 +1,75 @@
 #!/usr/bin/perl -w
 use File::Basename;
 
-open FILE, $ARGV[0] or die "Unable to open file: " . $ARGV[0];
-our $outname = $ARGV[1] . '/' . basename($ARGV[0]);
-open OUTFILE, '>' . $outname or die "Unable to open outfile: " . $outname;
+my $outname = $ARGV[1] . '/' . basename($ARGV[0]);
+my $outfile;
+open $outfile, '>' . $outname or die "Unable to open outfile: " . $outname;
 
-while(<FILE>) {
-	#Strip out import statements
-	next if(/\$import ([^ ]*);/);
-	
-	#Strip out debug statements
-	next if(/debug\(/);
-	next if(/debugl\(/);
-	
-	#Was it a merge comment?
-	if(/\/\/\$merge (.*)$/) {
-		#Merge in the requested file into our output
-		&merge($1);
-		
-	} else {
-		print OUTFILE $_;
-	}
-}
-
-close FILE;
-close OUTFILE;
-
+merge($ARGV[0], $outfile);
+close $outfile;
 exit;
 
 ####################################
 sub merge {
-	open MODFILE, $_[0] or printf STDERR "Could not open module " . $_[0] . "\n";
-	while(<MODFILE>) {
-		#Strip out module statements
-		next if(/^\$module/);
-
-		#Strip out import statements
-		next if(/\$import ([^ ]*);/);
-	
-		#Strip out debug statements
-		next if(/debug\(/);
-		next if(/debugl\(/);
-		
-		print OUTFILE $_;
+	my $file;
+	my $outfile = $_[1];
+	my $opened = 1;
+	open $file, $_[0] or $opened = 0;
+	if(!$opened) {
+		printf STDERR "Could not open module " . $_[0] . "\n";
+		return(0);
 	}
-	close MODFILE;
+	
+	while(<$file>) {
+		if(/^\W?\$import (\S*?)\s/) {
+			#Get the module filename
+			my $module = $1;
+			$module =~ s/\./\//g;
+			$module =~ s/;//;
+			$module =~ s/\/lslm/\.lslm/;
+			
+			#Did we do this one already?
+			if(!hasModule($module)) {
+				if($module ne 'common/log.lslm') {
+					#Import the module
+					addModule($module);
+					merge($module, $outfile);
+				}
+			}
+			
+		} else {
+			#Strip out module statements
+			next if(/^\$module/);
+	
+			#Strip out debug statements
+			next if(/debug\(/);
+			next if(/debugl\(/);
+			
+			print $outfile $_;
+		}
+	}
+	
+	close $file;
+}
+
+{
+	my @modules = ();
+
+	####################################
+	sub hasModule {
+		my $module = $_[0];
+		my $count = 0 + @modules;
+		
+		for(my $i = 0; $i < $count; $i++) {
+			if($modules[$i] eq $module) { return 1; }
+		}
+		
+		return 0;
+	}
+	
+	####################################
+	sub addModule {
+		my $module = $_[0];
+		push(@modules, $module);
+	}
 }
