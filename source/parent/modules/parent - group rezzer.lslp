@@ -1,20 +1,12 @@
 //==============================================================================
-// Builders' Buddy 3.0 (Parent Script - Base)
+// Builders' Buddy 3.0 (Parent Script - Group Rezzer Module)
 // by Newfie Pendragon, 2006-2013
 //==============================================================================
 // This script is copyrighted material, and has a few (minor) restrictions.
-// For complete details, including a revision history, please see
-//  http://wiki.secondlife.com/wiki/Builders_Buddy
+// Please see https://github.com/elnewfie/builders-buddy/blob/master/LICENSE.md
 //
-// The License for this script has changed relative to prior versions; please
-//  check the website noted above for details.
+// Builders' Buddy is available at https://github.com/elnewfie/builders-buddy
 //==============================================================================
-$import common.constants.lslm;
-$import common.log.lslm;
-$import storage.core.lslm;
-$import module.constants.lslm;
-$import module.core.lslm;
-$import module.group.core.lslm;
 
 //==============================================================================
 // CONFIGURABLE SETTINGS
@@ -71,12 +63,12 @@ initialize() {        //DO NOT TOUCH THIS LINE!
 //==============================================================================
 // DO NOT EDIT ANYTHING BELOW THIS LINE!!!
 //==============================================================================
-
-//$merge common/constants.lslm
-
-//$merge module/constants.lslm
-
-//$merge module/group/constants.lslm
+$import common.constants.lslm;
+$import common.log.lslm;
+$import storage.core.lslm;
+$import module.constants.lslm;
+$import module.core.lslm;
+$import module.group.core.lslm;
 
 //==============================================================================
 // Group Rezzer Constants
@@ -91,20 +83,6 @@ integer need_rebuild = TRUE;
 list groups;
 string action = "";
 integer page = 0;
-
-//$merge storage/vars.lslm
-
-//$merge common/comm/vars.lslm
-
-//$merge storage/core.lslm
-
-//$merge module/core.lslm
-
-//$merge common/util.lslm
-
-//$merge common/comm/core.lslm
-
-//$merge module/group/core.lslm
 
 //==============================================================================
 // Group Rezzer Functions

@@ -24,6 +24,14 @@ initialize() {        //DO NOT TOUCH THIS LINE!
 // DO NOT EDIT ANYTHING BELOW THIS LINE!!!
 //==============================================================================
 
+
+//==============================================================================
+//Communication variables
+//==============================================================================
+string msg_command;
+list msg_details;
+string msg_module;
+
 //==============================================================================
 //General Constants
 //==============================================================================
@@ -37,44 +45,6 @@ string MANAGER = "manager";
 string MODULE = "module";
 string TYPE_CHILD = "C";
 string TYPE_PARENT = "P";
-
-
-//==============================================================================
-//Menu Constants
-//==============================================================================
-string MENU_TYPE_ADMIN = "A";
-string MENU_TYPE_EVERYONE = "E";
-string MENU_TYPE_NONE = "X";
-string VAR_MOD_EVENTS = "mod_events";
-string VAR_MOD_MENU_DESC = "mod_menu_desc";
-string VAR_MOD_MENU_TYPE = "mod_menu_type";
-string VAR_MOD_NAME = "mod_name";
-string VAR_MOD_TYPE = "mod_type";
-
-
-//==============================================================================
-//Group Rezzer Constants
-//==============================================================================
-string VAR_REMOVE_TAG = "group_remove_tag";
-string VAR_PREFIX = "group_prefix";
-string VAR_POSTFIX = "group_postfix";
-
-
-//==============================================================================
-//Communication variables
-//==============================================================================
-string msg_command;
-list msg_details;
-string msg_module;
-
-
-//==============================================================================
-//Storage Variables
-//==============================================================================
-list values = [];
-list vars = [];
-
-
 
 //==============================================================================
 //Communication functions
@@ -119,6 +89,11 @@ send(string source, string dest, string command, list details)
     );
 }
 
+//==============================================================================
+//Storage Variables
+//==============================================================================
+list values = [];
+list vars = [];
 
 //==============================================================================
 //Storage Functions
@@ -174,6 +149,24 @@ set_list(string name, list values)
 	set(name, llDumpList2String(values, "|"));
 }
 
+//==============================================================================
+//Menu Constants
+//==============================================================================
+string MENU_TYPE_ADMIN = "A";
+string MENU_TYPE_EVERYONE = "E";
+string MENU_TYPE_NONE = "X";
+string VAR_MOD_EVENTS = "mod_events";
+string VAR_MOD_MENU_DESC = "mod_menu_desc";
+string VAR_MOD_MENU_TYPE = "mod_menu_type";
+string VAR_MOD_NAME = "mod_name";
+string VAR_MOD_TYPE = "mod_type";
+
+//==============================================================================
+//Group Rezzer Constants
+//==============================================================================
+string VAR_REMOVE_TAG = "group_remove_tag";
+string VAR_PREFIX = "group_prefix";
+string VAR_POSTFIX = "group_postfix";
 
 //==============================================================================
 //Group Rezzer Core Functions

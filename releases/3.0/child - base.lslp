@@ -3,11 +3,9 @@
 // by Newfie Pendragon, 2006-2013
 //==============================================================================
 // This script is copyrighted material, and has a few (minor) restrictions.
-// For complete details, including a revision history, please see
-//  http://wiki.secondlife.com/wiki/Builders_Buddy
+// Please see https://github.com/elnewfie/builders-buddy/blob/master/LICENSE.md
 //
-// The License for this script has changed relative to prior versions; please
-//  check the website noted above for details.
+// Builders' Buddy is available at https://github.com/elnewfie/builders-buddy
 //==============================================================================
 
 //==============================================================================
@@ -111,76 +109,11 @@ string MODULE = "module";
 string TYPE_CHILD = "C";
 string TYPE_PARENT = "P";
 
-
-//==============================================================================
-//Child Base Constants
-//==============================================================================
-string VAR_BASE_ID = "base_id";
-string VAR_CHANNEL = "channel";
-string VAR_GLOW_ON_IDENTIFY = "glow_on_identify";
-string VAR_GLOW_TIMEOUT = "glow_timeout";
-string VAR_MAX_X = "max_x";
-string VAR_MAX_Y = "max_y";
-string VAR_MAX_Z = "max_z";
-string VAR_MOVE_ON_REZ = "move_on_rez";
-string VAR_REPARENT_DELAY = "reparent_delay";
-string VAR_TIMER_DELAY = "timer_delay";
-string VAR_YELL_DELAY = "yell_delay";
-string VAR_YELL_TIMEOUT = "yell_timeout";
-string VAR_MOVE_SAFE = "move_safe";
-string VAR_SAY_ON_IDENTIFY = "say_on_identify";
-
-//==============================================================================
-//Child Base Defaults
-//==============================================================================
-string VAR_CHANNEL_DEFAULT = "-1000001";
-string VAR_GLOW_TIMEOUT_DEFAULT = "10";
-string VAR_REPARENT_DELAY_DEFAULT = "15";
-string VAR_TIMER_DELAY_DEFAULT = "0.5";
-string VAR_YELL_DELAY_DEFAULT = "1.0";
-string VAR_YELL_TIMEOUT_DEFAULT = "30";
-string VAR_MAX_X_DEFAULT = "256.0";
-string VAR_MAX_Y_DEFAULT = "256.0";
-string VAR_MAX_Z_DEFAULT = "4096.0";
-//==============================================================================
-//Base variables
-//==============================================================================
-integer absolute = FALSE;
-integer recorded = FALSE;
-vector current_offset;
-rotation current_rotation;
-rotation dest_rotation;
-vector dest_position;
-string glowables = "";
-integer glow_snapshot_count = 0;
-integer glow_timeout = 0;
-integer is_child = FALSE;
-integer need_initial_move = FALSE;
-integer need_glow = FALSE;
-integer need_move = FALSE;
-integer next_yell = 0;
-integer need_yell_parent = FALSE;
-key parent_key = NULL_KEY;
-integer reparent_time = 0;
-integer rez_timeout = 0;
-integer timer_active = FALSE;
-integer moving_single = FALSE;
-
-
 //==============================================================================
 //Storage Variables
 //==============================================================================
 list values = [];
 list vars = [];
-
-
-//==============================================================================
-//Communication variables
-//==============================================================================
-string msg_command;
-list msg_details;
-string msg_module;
-
 
 //==============================================================================
 //Storage Functions
@@ -236,7 +169,87 @@ set_list(string name, list values)
 	set(name, llDumpList2String(values, "|"));
 }
 
+//==============================================================================
+//Child Base Constants
+//==============================================================================
+string VAR_BASE_ID = "base_id";
+string VAR_CHANNEL = "channel";
+string VAR_GLOW_ON_IDENTIFY = "glow_on_identify";
+string VAR_GLOW_TIMEOUT = "glow_timeout";
+string VAR_MAX_X = "max_x";
+string VAR_MAX_Y = "max_y";
+string VAR_MAX_Z = "max_z";
+string VAR_MOVE_ON_REZ = "move_on_rez";
+string VAR_REPARENT_DELAY = "reparent_delay";
+string VAR_TIMER_DELAY = "timer_delay";
+string VAR_YELL_DELAY = "yell_delay";
+string VAR_YELL_TIMEOUT = "yell_timeout";
+string VAR_MOVE_SAFE = "move_safe";
+string VAR_SAY_ON_IDENTIFY = "say_on_identify";
 
+//==============================================================================
+//Child Base Defaults
+//==============================================================================
+string VAR_CHANNEL_DEFAULT = "-1000001";
+string VAR_GLOW_TIMEOUT_DEFAULT = "10";
+string VAR_REPARENT_DELAY_DEFAULT = "15";
+string VAR_TIMER_DELAY_DEFAULT = "0.5";
+string VAR_YELL_DELAY_DEFAULT = "1.0";
+string VAR_YELL_TIMEOUT_DEFAULT = "30";
+string VAR_MAX_X_DEFAULT = "256.0";
+string VAR_MAX_Y_DEFAULT = "256.0";
+string VAR_MAX_Z_DEFAULT = "4096.0";
+
+
+//==============================================================================
+//Communication variables
+//==============================================================================
+string msg_command;
+list msg_details;
+string msg_module;
+
+//==============================================================================
+//Communication functions
+//==============================================================================
+
+// message: <source>|<target>|<command>
+// id: <details...>
+////////////////////
+integer parse(list targets, integer number, string message, string id) {
+		if(number != BB_API) return FALSE;
+		
+		list parts = llParseStringKeepNulls((string)id, ["|"], []);
+		if(llGetListLength(parts) != 3) return FALSE;
+		
+		//Check the list of targets and see if it's for one of the ones we're listening for
+		integer num_targets = llGetListLength(targets);
+		integer i;
+		string target = llList2String(parts, 1);
+		for(i = 0; i < num_targets; i++) {
+			if(llList2String(targets, i) == target) {
+				//It's good
+				msg_module = llList2String(parts, 0);
+				msg_command = llList2String(parts, 2);
+				msg_details = llParseStringKeepNulls(message, ["|"], []);
+				
+				return TRUE;
+			}
+		}
+		
+		return FALSE;
+}
+
+////////////////////
+send(string source, string dest, string command, list details)
+{
+	
+    llMessageLinked(
+    	LINK_THIS,
+    	BB_API, 
+    	llDumpList2String(details, "|"),
+    	llDumpList2String([source, dest, command], "|")
+    );
+}
 
 //==============================================================================
 //Child Core variables
@@ -317,50 +330,29 @@ stop_listening()
 }
 
 
-
-
 //==============================================================================
-//Communication functions
+//Base variables
 //==============================================================================
-
-// message: <source>|<target>|<command>
-// id: <details...>
-////////////////////
-integer parse(list targets, integer number, string message, string id) {
-		if(number != BB_API) return FALSE;
-		
-		list parts = llParseStringKeepNulls((string)id, ["|"], []);
-		if(llGetListLength(parts) != 3) return FALSE;
-		
-		//Check the list of targets and see if it's for one of the ones we're listening for
-		integer num_targets = llGetListLength(targets);
-		integer i;
-		string target = llList2String(parts, 1);
-		for(i = 0; i < num_targets; i++) {
-			if(llList2String(targets, i) == target) {
-				//It's good
-				msg_module = llList2String(parts, 0);
-				msg_command = llList2String(parts, 2);
-				msg_details = llParseStringKeepNulls(message, ["|"], []);
-				
-				return TRUE;
-			}
-		}
-		
-		return FALSE;
-}
-
-////////////////////
-send(string source, string dest, string command, list details)
-{
-	
-    llMessageLinked(
-    	LINK_THIS,
-    	BB_API, 
-    	llDumpList2String(details, "|"),
-    	llDumpList2String([source, dest, command], "|")
-    );
-}
+integer absolute = FALSE;
+integer recorded = FALSE;
+vector current_offset;
+rotation current_rotation;
+rotation dest_rotation;
+vector dest_position;
+string glowables = "";
+integer glow_snapshot_count = 0;
+integer glow_timeout = 0;
+integer is_child = FALSE;
+integer need_initial_move = FALSE;
+integer need_glow = FALSE;
+integer need_move = FALSE;
+integer next_yell = 0;
+integer need_yell_parent = FALSE;
+key parent_key = NULL_KEY;
+integer reparent_time = 0;
+integer rez_timeout = 0;
+integer timer_active = FALSE;
+integer moving_single = FALSE;
 
 //==============================================================================
 //Base Functions

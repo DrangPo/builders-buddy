@@ -3,11 +3,9 @@
 // by Newfie Pendragon, 2006-2013
 //==============================================================================
 // This script is copyrighted material, and has a few (minor) restrictions.
-// For complete details, including a revision history, please see
-//  http://wiki.secondlife.com/wiki/Builders_Buddy
+// Please see https://github.com/elnewfie/builders-buddy/blob/master/LICENSE.md
 //
-// The License for this script has changed relative to prior versions; please
-//  check the website noted above for details.
+// Builders' Buddy is available at https://github.com/elnewfie/builders-buddy
 //==============================================================================
 
 //==============================================================================
@@ -85,52 +83,11 @@ string TYPE_PARENT = "P";
 
 
 //==============================================================================
-//Menu Constants
-//==============================================================================
-string MENU_TYPE_ADMIN = "A";
-string MENU_TYPE_EVERYONE = "E";
-string MENU_TYPE_NONE = "X";
-string VAR_MOD_EVENTS = "mod_events";
-string VAR_MOD_MENU_DESC = "mod_menu_desc";
-string VAR_MOD_MENU_TYPE = "mod_menu_type";
-string VAR_MOD_NAME = "mod_name";
-string VAR_MOD_TYPE = "mod_type";
-
-
-//==============================================================================
 //Communication variables
 //==============================================================================
 string msg_command;
 list msg_details;
 string msg_module;
-
-
-//==============================================================================
-//Storage Variables
-//==============================================================================
-list values = [];
-list vars = [];
-
-
-//==============================================================================
-//Manager Constants
-//==============================================================================
-string VAR_ALLOW_CLEAN = "allow_clean";
-string VAR_ALLOW_GROUP = "allow_group";
-string VAR_ALLOW_FORGET = "allow_forget";
-string VAR_ALLOW_RECORD = "allow_record";
-string VAR_CONFIRM_CLEAN = "confirm_clean";
-string VAR_CONFIRM_FINISH = "confirm_finish";
-string VAR_CREATORS = "creators";
-string VAR_DELETE_ON_REZ = "delete_on_rez";
-string VAR_EVENT_TIMEOUT = "event_timeout";
-string VAR_FULL_RIGHTS = "full_rights";
-string VAR_MENU_LISTEN_TIME = "menu_listen";
-string VAR_MENU_ON_TOUCH = "menu_on_touch";
-string VAR_SAFE_CLEAN = "safe_clean";
-
-
-
 
 //==============================================================================
 //Communication functions
@@ -175,14 +132,11 @@ send(string source, string dest, string command, list details)
     );
 }
 
-
 //==============================================================================
-//Group Rezzer Constants
+//Storage Variables
 //==============================================================================
-string VAR_REMOVE_TAG = "group_remove_tag";
-string VAR_PREFIX = "group_prefix";
-string VAR_POSTFIX = "group_postfix";
-
+list values = [];
+list vars = [];
 
 //==============================================================================
 //Storage Functions
@@ -239,6 +193,105 @@ set_list(string name, list values)
 }
 
 
+//==============================================================================
+// Utility Functions
+//==============================================================================
+
+////////////////////
+string get_short_name(string longName)
+{
+	longName = llSHA1String(longName);
+    string shortName;
+    integer ptr = 0;
+    integer strLength = llStringLength(longName);
+    string char;
+    for(ptr = 0; ptr < strLength; ptr += 2) {
+        //Convert the 2-character hex code to a UTF-8 value
+        //Thanks to http://wiki.secondlife.com/wiki/Chr for the concept for this code here
+        integer ord = (integer)("0x" + llGetSubString(longName, ptr, ptr + 1));
+        if (ord <= 0) {
+        	char = "";
+        	
+        } else if (ord < 0x80) {
+        	char = llUnescapeURL(get_url_code(ord));
+        	
+        } else if (ord < 0x800) {
+			char = llUnescapeURL(get_url_code((ord >> 6) & 0x1F | 0xC0) + get_url_code(ord & 0x3F | 0x80));
+			
+        } else if (ord < 0x10000) {
+        	char = llUnescapeURL(get_url_code((ord >> 12) & 0x0F | 0xE0) + get_url_code((ord >> 6) & 0x3F | 0x80) + get_url_code(ord & 0x3F | 0x80));
+        	
+        } else {
+        	char = llUnescapeURL(get_url_code((ord >> 18) & 0x0F | 0xF0)
+                        + get_url_code((ord >> 12) & 0x3F | 0x80)
+                        + get_url_code((ord >> 6) & 0x3F | 0x80)
+                        + get_url_code(ord & 0x3F | 0x80));
+        }
+
+		shortName += char;
+    }
+
+    return shortName;
+}
+
+////////////////////
+string get_url_code(integer b)
+{
+    string hexd = "0123456789ABCDEF";
+    return "%" + llGetSubString(hexd, b>>4, b>>4) + llGetSubString(hexd, b&15, b&15);
+}
+
+//menuFormat Created by Huns Valens
+////////////////////
+list menuFormat(list theButtons) {
+    list btnOut;
+    integer nButtons = llGetListLength(theButtons);
+    integer nLastRow = nButtons % 3;
+    integer lastRow = nButtons - nLastRow;
+    integer row;
+
+    // Reverse the array in chunks of 3, since an llDialog() row is 3 buttons.
+    // We do not handle the first line of buttons, since they may not be a multiple of 3.
+    for(row = nButtons; row >= nLastRow; row -= 3) {
+        btnOut += llList2List(theButtons, row, row + 2);
+    }
+
+    // Now handle the first line of buttons, which can be 1, 2, or 3 buttons long.
+    for(row = 0; row < nLastRow; row++) {
+        btnOut += llList2String(theButtons, row);
+    }
+
+    return btnOut;
+}
+
+//==============================================================================
+//Menu Constants
+//==============================================================================
+string MENU_TYPE_ADMIN = "A";
+string MENU_TYPE_EVERYONE = "E";
+string MENU_TYPE_NONE = "X";
+string VAR_MOD_EVENTS = "mod_events";
+string VAR_MOD_MENU_DESC = "mod_menu_desc";
+string VAR_MOD_MENU_TYPE = "mod_menu_type";
+string VAR_MOD_NAME = "mod_name";
+string VAR_MOD_TYPE = "mod_type";
+
+//==============================================================================
+//Manager Constants
+//==============================================================================
+string VAR_ALLOW_CLEAN = "allow_clean";
+string VAR_ALLOW_GROUP = "allow_group";
+string VAR_ALLOW_FORGET = "allow_forget";
+string VAR_ALLOW_RECORD = "allow_record";
+string VAR_CONFIRM_CLEAN = "confirm_clean";
+string VAR_CONFIRM_FINISH = "confirm_finish";
+string VAR_CREATORS = "creators";
+string VAR_DELETE_ON_REZ = "delete_on_rez";
+string VAR_EVENT_TIMEOUT = "event_timeout";
+string VAR_FULL_RIGHTS = "full_rights";
+string VAR_MENU_LISTEN_TIME = "menu_listen";
+string VAR_MENU_ON_TOUCH = "menu_on_touch";
+string VAR_SAFE_CLEAN = "safe_clean";
 
 //==============================================================================
 //Manager Core Constants
@@ -917,78 +970,6 @@ manager_event_state_entry() {
 	send_module(ALL_MODULES, "reset", [], TRUE);
 	send_base("manager_ready", [llGetFreeMemory()]);
 }
-
-//==============================================================================
-// Utility Functions
-//==============================================================================
-
-////////////////////
-string get_short_name(string longName)
-{
-	longName = llSHA1String(longName);
-    string shortName;
-    integer ptr = 0;
-    integer strLength = llStringLength(longName);
-    string char;
-    for(ptr = 0; ptr < strLength; ptr += 2) {
-        //Convert the 2-character hex code to a UTF-8 value
-        //Thanks to http://wiki.secondlife.com/wiki/Chr for the concept for this code here
-        integer ord = (integer)("0x" + llGetSubString(longName, ptr, ptr + 1));
-        if (ord <= 0) {
-        	char = "";
-        	
-        } else if (ord < 0x80) {
-        	char = llUnescapeURL(get_url_code(ord));
-        	
-        } else if (ord < 0x800) {
-			char = llUnescapeURL(get_url_code((ord >> 6) & 0x1F | 0xC0) + get_url_code(ord & 0x3F | 0x80));
-			
-        } else if (ord < 0x10000) {
-        	char = llUnescapeURL(get_url_code((ord >> 12) & 0x0F | 0xE0) + get_url_code((ord >> 6) & 0x3F | 0x80) + get_url_code(ord & 0x3F | 0x80));
-        	
-        } else {
-        	char = llUnescapeURL(get_url_code((ord >> 18) & 0x0F | 0xF0)
-                        + get_url_code((ord >> 12) & 0x3F | 0x80)
-                        + get_url_code((ord >> 6) & 0x3F | 0x80)
-                        + get_url_code(ord & 0x3F | 0x80));
-        }
-
-		shortName += char;
-    }
-
-    return shortName;
-}
-
-////////////////////
-string get_url_code(integer b)
-{
-    string hexd = "0123456789ABCDEF";
-    return "%" + llGetSubString(hexd, b>>4, b>>4) + llGetSubString(hexd, b&15, b&15);
-}
-
-//menuFormat Created by Huns Valens
-////////////////////
-list menuFormat(list theButtons) {
-    list btnOut;
-    integer nButtons = llGetListLength(theButtons);
-    integer nLastRow = nButtons % 3;
-    integer lastRow = nButtons - nLastRow;
-    integer row;
-
-    // Reverse the array in chunks of 3, since an llDialog() row is 3 buttons.
-    // We do not handle the first line of buttons, since they may not be a multiple of 3.
-    for(row = nButtons; row >= nLastRow; row -= 3) {
-        btnOut += llList2List(theButtons, row, row + 2);
-    }
-
-    // Now handle the first line of buttons, which can be 1, 2, or 3 buttons long.
-    for(row = 0; row < nLastRow; row++) {
-        btnOut += llList2String(theButtons, row);
-    }
-
-    return btnOut;
-}
-
 ////////////////////
 ////////////////////
 ////////////////////
