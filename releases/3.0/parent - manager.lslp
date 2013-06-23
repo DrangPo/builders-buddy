@@ -24,6 +24,11 @@
 //   Allow users that are in the same group (if set) as the parent object to
 //   access the menu.  Must be set to "Y" or "N".
 //==============================================================================
+// VAR_ALLOW_RECORD:
+//   Is the user permitted to request child objects to record their
+//   recorded position information.  Must be set to "Y" or "N".  Leave this as
+//   "Y" for most cases.
+//==============================================================================
 // VAR_CONFIRM_CLEAN:
 //   When the user selects "Clean" from the menu, displays a "Are you sure?"
 //   confirmation dialog.  Must be set to "Y" or "N".  Text to be displayed
@@ -54,6 +59,7 @@ initialize() {        //DO NOT TOUCH THIS LINE!
 	set(VAR_ALLOW_CLEAN, "Y");
 	set(VAR_ALLOW_FORGET, "Y");
     set(VAR_ALLOW_GROUP, "Y");
+	set(VAR_ALLOW_RECORD, "Y");
 	set(VAR_CONFIRM_CLEAN, "Y");
 	set(VAR_CONFIRM_FINISH, "Y");
 	set_list(VAR_CREATORS, []);
@@ -192,7 +198,6 @@ set_list(string name, list values)
 	set(name, llDumpList2String(values, "|"));
 }
 
-
 //==============================================================================
 // Utility Functions
 //==============================================================================
@@ -277,6 +282,12 @@ string VAR_MOD_NAME = "mod_name";
 string VAR_MOD_TYPE = "mod_type";
 
 //==============================================================================
+//Manager Core Constants
+//==============================================================================
+string VAR_CLEAN_WARNING = "WARNING: Cleaning will make these objects delete from the region.  They do NOT go back into inventory.\n\nClean?";
+string VAR_FINISH_WARNING = "WARNING: Pressing Finish will freeze these items into position and remove the Builder\'s Buddy scripts.  You will have to move/delete them manually after this point.\n\nFinish?";
+
+//==============================================================================
 //Manager Constants
 //==============================================================================
 string VAR_ALLOW_CLEAN = "allow_clean";
@@ -293,11 +304,6 @@ string VAR_MENU_LISTEN_TIME = "menu_listen";
 string VAR_MENU_ON_TOUCH = "menu_on_touch";
 string VAR_SAFE_CLEAN = "safe_clean";
 
-//==============================================================================
-//Manager Core Constants
-//==============================================================================
-string VAR_CLEAN_WARNING = "WARNING: Cleaning will make these objects delete from the region.  They do NOT go back into inventory.\n\nClean?";
-string VAR_FINISH_WARNING = "WARNING: Pressing Finish will freeze these items into position and remove the Builder\'s Buddy scripts.  You will have to move/delete them manually after this point.\n\nFinish?";
 
 //==============================================================================
 //Manager Core Variables

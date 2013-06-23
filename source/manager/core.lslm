@@ -8,11 +8,6 @@ $import common.util.lslm;
 $import module.constants.lslm;
 $import manager.constants.lslm;
 
-//==============================================================================
-//Manager Core Constants
-//==============================================================================
-string VAR_CLEAN_WARNING = "WARNING: Cleaning will make these objects delete from the region.  They do NOT go back into inventory.\n\nClean?";
-string VAR_FINISH_WARNING = "WARNING: Pressing Finish will freeze these items into position and remove the Builder\'s Buddy scripts.  You will have to move/delete them manually after this point.\n\nFinish?";
 
 //==============================================================================
 //Manager Core Variables

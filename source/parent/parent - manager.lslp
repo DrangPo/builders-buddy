@@ -24,6 +24,11 @@
 //   Allow users that are in the same group (if set) as the parent object to
 //   access the menu.  Must be set to "Y" or "N".
 //==============================================================================
+// VAR_ALLOW_RECORD:
+//   Is the user permitted to request child objects to record their
+//   recorded position information.  Must be set to "Y" or "N".  Leave this as
+//   "Y" for most cases.
+//==============================================================================
 // VAR_CONFIRM_CLEAN:
 //   When the user selects "Clean" from the menu, displays a "Are you sure?"
 //   confirmation dialog.  Must be set to "Y" or "N".  Text to be displayed
@@ -54,6 +59,7 @@ initialize() {        //DO NOT TOUCH THIS LINE!
 	set(VAR_ALLOW_CLEAN, "Y");
 	set(VAR_ALLOW_FORGET, "Y");
     set(VAR_ALLOW_GROUP, "Y");
+	set(VAR_ALLOW_RECORD, "Y");
 	set(VAR_CONFIRM_CLEAN, "Y");
 	set(VAR_CONFIRM_FINISH, "Y");
 	set_list(VAR_CREATORS, []);
@@ -65,11 +71,10 @@ initialize() {        //DO NOT TOUCH THIS LINE!
 //==============================================================================
 // DO NOT EDIT ANYTHING BELOW THIS LINE!!!
 //==============================================================================
-
+$import manager.core.lslm; 
 $import common.constants.lslm;
 $import common.comm.core.lslm;
 $import storage.core.lslm;
-$import manager.core.lslm; 
 
 ////////////////////
 ////////////////////

@@ -271,6 +271,8 @@ integer from_parent(key source_id, string source_base_id, string child_id, integ
 ////////////////////
 got_parent_message()
 {
+	debugl(TRACE, ["child_base.got_parent_message()", "listen_command: " + listen_command]);
+	
     if(listen_command == "ping") {
     	send_parent("pong", []);
     	return;
@@ -581,9 +583,10 @@ send_parent(string command, list options)
 {
 	if(parent_key == NULL_KEY) {
 		debugl(DEBUG, ["child - base.send_parent()", "channel: " + get(VAR_CHANNEL, VAR_CHANNEL_DEFAULT)]);
+		
 		//No parent, send on the generic channel
 		llRegionSay(
-			parent_channel,
+			base_channel,
 			llDumpList2String([BASE, command] + options, "|")
 		);
 	} else {

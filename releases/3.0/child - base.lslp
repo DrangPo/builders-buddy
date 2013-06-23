@@ -256,6 +256,8 @@ send(string source, string dest, string command, list details)
 //==============================================================================
 integer parent_channel = 0;
 integer parent_handle = 0;
+integer base_channel = 0;
+integer base_handle = 0;
 integer listen_channel;
 string listen_base;
 string listen_command;
@@ -301,34 +303,54 @@ send_module(string dest_module, string command, list details, integer force)
 ////////////////////
 start_listening()
 {
-	if(parent_handle != 0) return;
-	
-	//Do  nothing if we're already listening
-	if(parent_channel == 0) {
+	list channels = [];
+	base_channel = (integer)get(VAR_CHANNEL, "-192567");
+
+	//No currently active listener?
+	if(base_handle == 0) {
 		//Grab the channel
-		integer config_channel = (integer)get(VAR_CHANNEL, "-192567");
-		if(config_channel == 0) {
-			return;
+		if(base_channel < 0) {
+			//Activate listener
+			base_handle = llListen(base_channel, "", NULL_KEY, "");
+			channels += [base_channel];			
 		}
-		
-		parent_channel = config_channel;
 	}
 	
-	parent_handle = llListen(parent_channel, "", NULL_KEY, "");
-	send_module(ALL_MODULES, "listen_start", [parent_channel], FALSE);
+	if(parent_handle == 0) {
+		//Do we have a parent channel that is different from the base channel?
+		if((parent_channel < 0) && (parent_channel != base_channel)) {
+			parent_handle = llListen(parent_channel, "", NULL_KEY, "");
+			channels += [parent_channel];
+		}
+	}
+
+	if(llGetListLength(channels) > 0) {	
+		send_module(ALL_MODULES, "listen_start", channels, FALSE);
+	}
 }
 
 ////////////////////
 stop_listening()
 {
+	list channels = [];
+	
 	//Have an active listener?
+	if(base_handle != 0) {
+		llListenRemove(base_handle);
+		base_handle = 0;
+		channels += [base_channel];
+	}
+	
 	if(parent_handle != 0) {
 		llListenRemove(parent_handle);
-		send_module(ALL_MODULES, "listen_stop", [parent_channel], FALSE);
 		parent_handle = 0;
+		channels += [parent_channel];
+	}
+	
+	if(llGetListLength(channels) > 0) {
+		send_module(ALL_MODULES, "listen_stop", channels, FALSE);
 	}
 }
-
 
 //==============================================================================
 //Base variables
@@ -494,6 +516,7 @@ integer from_parent(key source_id, string source_base_id, string child_id, integ
 ////////////////////
 got_parent_message()
 {
+	
     if(listen_command == "ping") {
     	send_parent("pong", []);
     	return;
@@ -801,9 +824,10 @@ pre_move_relative(vector new_position, rotation new_rotation)
 send_parent(string command, list options)
 {
 	if(parent_key == NULL_KEY) {
+		
 		//No parent, send on the generic channel
 		llRegionSay(
-			parent_channel,
+			base_channel,
 			llDumpList2String([BASE, command] + options, "|")
 		);
 	} else {
